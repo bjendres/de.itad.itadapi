@@ -74,6 +74,7 @@ function itadapi_civicrm_enable() {
   $customData->syncOptionGroup(__DIR__ . '/resources/option_group_activity_type.json');
   $customData->syncCustomGroup(__DIR__ . '/resources/custom_group_plone_facility.json');
   $customData->syncCustomGroup(__DIR__ . '/resources/custom_group_plone_individual.json');
+  $customData->syncEntities(__DIR__ . '/resources/relationship_type_entities.json');
 }
 
 /**

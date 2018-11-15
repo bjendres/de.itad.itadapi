@@ -1,0 +1,19 @@
+{
+  "entity": "RelationshipType",
+  "_entities": [
+    {
+      "_lookup": ["name_a_b", "name_b_a"],
+      "_translate": ["label_a_b", "label_b_a"],
+      "name_a_b": "Bearbeitungsberechtigt für Anlage",
+      "label_a_b": "Bearbeitungsberechtigt für Anlage",
+      "name_b_a": "Bearbeitungsberechtigter Benutzer",
+      "label_b_a": "Bearbeitungsberechtigter Benutzer",
+      "description": "Beziehung für Anlagen-Bearbeitungsberechtigungen",
+      "contact_type_a": "Individual",
+      "contact_type_b": "Organization",
+      "contact_sub_type_b": "Anlage",
+      "is_active": "1",
+      "is_reserved": "1"
+    }
+  ]
+}
