@@ -101,6 +101,9 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
           'plone_group',
           'is_plone_group'
         ) => 1,
+        'options' => array(
+          'limit' => 0,
+        ),
       ));
 
       // If no Plone user name is given, retrieve all Plone groups.
@@ -136,6 +139,9 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
         'contact_type' => 'Organization',
         'contact_sub_type' => 'Anlage',
         'return' => $plone_facility_code_custom_field_key,
+        'options' => array(
+          'limit' => 0,
+        ),
       ));
 
       // If no Plone user name is given, retrieve all facilities.
@@ -155,6 +161,9 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
         $relationships = civicrm_api3('Relationship', 'get', array(
           'relationship_type_id' => $relationship_type['id'],
           'contact_id_a' => $contact['id'],
+          'options' => array(
+            'limit' => 0,
+          ),
         ));
 
         foreach ($relationships['values'] as $relationship) {
