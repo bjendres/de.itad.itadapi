@@ -70,7 +70,7 @@ function itadapi_civicrm_enable() {
   _itadapi_civix_civicrm_enable();
 
   require_once 'CRM/Itadapi/CustomData.php';
-  $customData = new CRM_Itadapi_CustomData('com.proveg.api');
+  $customData = new CRM_Itadapi_CustomData('de.itad.itadapi');
   $customData->syncOptionGroup(__DIR__ . '/resources/option_group_activity_type.json');
   $customData->syncCustomGroup(__DIR__ . '/resources/custom_group_plone_facility.json');
   $customData->syncCustomGroup(__DIR__ . '/resources/custom_group_plone_individual.json');
