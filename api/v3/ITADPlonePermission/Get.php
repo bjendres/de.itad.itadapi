@@ -39,6 +39,13 @@ function _civicrm_api3_i_t_a_d_plone_permission_Get_spec(&$params) {
     'api.required' => 0,
     'description' => 'The Plone user name of the user to retrieve permissions for.',
   );
+  $params['contact_id'] = array(
+    'name' => 'contact_id',
+    'title' => 'CiviCRM Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api-required' => 0,
+    'description' => 'The CiviCRM Contact ID of the user to retrieve permissions for.',
+  );
 }
 
 /**
@@ -86,11 +93,16 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
       ));
     }
 
+    // Retrieve contact for given contact ID.
+    if (!empty($params['contact_id'])) {
+      $contact = civicrm_api3('Contact', 'getsingle', array(
+        'id' => $params['contact_id'],
+        'return' => 'group',
+      ));
+    }
+
     // The results array.
-    $permissions = array(
-      'PloneGroup' => array(),
-      'Facility' => array(),
-    );
+    $permissions = array();
 
     // Retrieve "PloneGroup" results.
     if (empty($params['permission_type']) || in_array('PloneGroup', $params['permission_type'])) {
@@ -107,14 +119,15 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
       ));
 
       // If no Plone user name is given, retrieve all Plone groups.
-      if (empty($params['plone_username'])) {
+      if (!isset($contact)) {
         foreach ($plone_groups['values'] as $plone_group_id => $plone_group) {
           $plone_group_results[] = $plone_group_id;
         }
       }
 
-      // If a Plone user name is given, retrieve their Plone group memberships.
-      elseif ($contact) {
+      // If a Plone user name or CiviCRM contact ID is given, retrieve their
+      // Plone group memberships.
+      else {
         foreach (explode(',', $contact['groups']) as $contact_group_id) {
           if (array_key_exists($contact_group_id, $plone_groups['values'])) {
             $plone_group_results[] = $contact_group_id;
@@ -124,7 +137,7 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
 
       // Add Plone group results to permissions array.
       foreach ($plone_group_results as $plone_group_id) {
-        $permissions['PloneGroup'][] = $plone_groups['values'][$plone_group_id]['title'];
+        $permissions[] = $plone_groups['values'][$plone_group_id]['title'];
       }
     }
 
@@ -144,13 +157,14 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
         ),
       ));
 
-      // If no Plone user name is given, retrieve all facilities.
-      if (empty($params['plone_username'])) {
+      // If no Plone user name or CiviCRM contact ID is given, retrieve all
+      // facilities.
+      if (!isset($contact)) {
         foreach ($facilities['values'] as $facility_id => $facility) {
           $facility_results[] = $facility_id;
         }
       }
-      elseif ($contact) {
+      else {
         // Retrieve facilities the contact has a relationship of type
         // "Bearbeitungsberechtigung" to.
         $relationship_type = civicrm_api3('RelationshipType', 'getsingle', array(
@@ -173,7 +187,7 @@ function civicrm_api3_i_t_a_d_plone_permission_Get($params) {
 
       // Add facility results to permissions array.
       foreach ($facility_results as $facility_id) {
-        $permissions['Facility'][] = $facilities['values'][$facility_id][$plone_facility_code_custom_field_key];
+        $permissions[] = $facilities['values'][$facility_id][$plone_facility_code_custom_field_key];
       }
     }
 

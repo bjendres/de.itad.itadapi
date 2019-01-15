@@ -121,7 +121,7 @@ function civicrm_api3_i_t_a_d_plone_user_Get($params) {
       foreach ($contacts['values'] as $contact) {
         foreach (explode(',', $contact['groups']) as $contact_group_id) {
           if (array_key_exists($contact_group_id, $groups['values'])) {
-            $users[$contact[$plone_username_custom_field_key]]['PloneGroup'][] = $groups['values'][$contact_group_id]['title'];
+            $users[$contact['id']][] = $groups['values'][$contact_group_id]['title'];
           }
         }
       }
@@ -164,7 +164,7 @@ function civicrm_api3_i_t_a_d_plone_user_Get($params) {
           'return' => $plone_username_custom_field_key,
         ));
 
-        $users[$contact[$plone_username_custom_field_key]]['Facility'][] = $facilities['values'][$relationship['contact_id_b']][$plone_facility_code_custom_field_key];
+        $users[$contact['id']][] = $facilities['values'][$relationship['contact_id_b']][$plone_facility_code_custom_field_key];
       }
     }
 
