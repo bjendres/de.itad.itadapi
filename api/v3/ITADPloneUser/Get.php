@@ -75,15 +75,15 @@ function civicrm_api3_i_t_a_d_plone_user_Get($params) {
       }
     }
 
-    // Require a single permission type when given a permission ID.
-    if (!empty($params['permission_id'])) {
-      if (count($params['permission_type']) != 1) {
-        throw new CiviCRM_API3_Exception(
-          E::ts('A single permission type is required when given a permission ID.'),
-          'invalid_format'
-        );
-      }
-    }
+//    // Require a single permission type when given a permission ID.
+//    if (!empty($params['permission_id'])) {
+//      if (count($params['permission_type']) != 1) {
+//        throw new CiviCRM_API3_Exception(
+//          E::ts('A single permission type is required when given a permission ID.'),
+//          'invalid_format'
+//        );
+//      }
+//    }
 
     // The results array.
     $users = array();
@@ -108,20 +108,22 @@ function civicrm_api3_i_t_a_d_plone_user_Get($params) {
         $group_params['title'] = $params['permission_id'];
       }
       $groups = civicrm_api3('Group', 'get', $group_params);
-      $contacts = civicrm_api3('Contact', 'get', array(
-        'group' => array('IN' => array_keys($groups['values'])),
-        'return' => array(
-          $plone_username_custom_field_key,
-          'group',
-        ),
-        'options' => array(
-          'limit' => 0,
-        ),
-      ));
-      foreach ($contacts['values'] as $contact) {
-        foreach (explode(',', $contact['groups']) as $contact_group_id) {
-          if (array_key_exists($contact_group_id, $groups['values'])) {
-            $users[$contact['id']][] = $groups['values'][$contact_group_id]['title'];
+      if ($groups['count'] > 0) {
+        $contacts = civicrm_api3('Contact', 'get', array(
+          'group' => array('IN' => array_keys($groups['values'])),
+          'return' => array(
+            $plone_username_custom_field_key,
+            'group',
+          ),
+          'options' => array(
+            'limit' => 0,
+          ),
+        ));
+        foreach ($contacts['values'] as $contact) {
+          foreach (explode(',', $contact['groups']) as $contact_group_id) {
+            if (array_key_exists($contact_group_id, $groups['values'])) {
+              $users[$contact['id']][] = $groups['values'][$contact_group_id]['title'];
+            }
           }
         }
       }
@@ -151,20 +153,22 @@ function civicrm_api3_i_t_a_d_plone_user_Get($params) {
       }
       $facilities = civicrm_api3('Contact', 'get', $facility_params);
 
-      $relationships = civicrm_api3('Relationship', 'get', array(
-        'relationship_type_id' => $relationship_type['id'],
-        'contact_id_b' => array('IN' => array_keys($facilities['values'])),
-        'options' => array(
-          'limit' => 0,
-        ),
-      ));
-      foreach ($relationships['values'] as $relationship) {
-        $contact = civicrm_api3('Contact', 'getsingle', array(
-          'id' => $relationship['contact_id_a'],
-          'return' => $plone_username_custom_field_key,
+      if ($facilities['count'] > 0) {
+        $relationships = civicrm_api3('Relationship', 'get', array(
+          'relationship_type_id' => $relationship_type['id'],
+          'contact_id_b' => array('IN' => array_keys($facilities['values'])),
+          'options' => array(
+            'limit' => 0,
+          ),
         ));
+        foreach ($relationships['values'] as $relationship) {
+          $contact = civicrm_api3('Contact', 'getsingle', array(
+            'id' => $relationship['contact_id_a'],
+            'return' => $plone_username_custom_field_key,
+          ));
 
-        $users[$contact['id']][] = $facilities['values'][$relationship['contact_id_b']][$plone_facility_code_custom_field_key];
+          $users[$contact['id']][] = $facilities['values'][$relationship['contact_id_b']][$plone_facility_code_custom_field_key];
+        }
       }
     }
 
